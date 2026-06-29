@@ -271,11 +271,10 @@ async function sendMessage() {
       queriesRun++;
       statQueries.textContent = queriesRun;
     }
-  } catch (err) {
+ } catch (err) {
     typingEl.remove();
-    addMessage("assistant", "Connection error. Please try again.");
+    addMessage("assistant", "Error: " + (err.message || JSON.stringify(err)));
   }
-
   isLoading = false;
   updateSendBtn();
   chatMessages.scrollTop = chatMessages.scrollHeight;
