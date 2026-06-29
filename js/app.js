@@ -17,83 +17,157 @@ let isLoading = false;
 let imagesAnalyzed = 0;
 let queriesRun = 0;
 
-// ─── Image Loading ─────────────────────────────────────────────────────────
+// ─── Demo Dataset ────────────────────────────────────────────────────────────
+const DEMO_SAMPLES = [
+  {
+    label: "Street Scene",
+    emoji: "🏙️",
+    url: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80",
+    prompt: "Describe what you see in this city scene. What objects, people, and activities are visible?"
+  },
+  {
+    label: "Nature",
+    emoji: "🌿",
+    url: "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80",
+    prompt: "Analyze this nature scene. What plants, animals, or natural elements can you identify?"
+  },
+  {
+    label: "Food",
+    emoji: "🍜",
+    url: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=80",
+    prompt: "What food is this? Describe it in detail including ingredients you can spot."
+  },
+  {
+    label: "Dashboard/UI",
+    emoji: "📊",
+    url: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
+    prompt: "Analyze this data visualization. What trends or insights can you extract?"
+  },
+  {
+    label: "Architecture",
+    emoji: "🏛️",
+    url: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=800&q=80",
+    prompt: "Describe this building's architectural style, features, and estimated era."
+  },
+  {
+    label: "Animal",
+    emoji: "🐾",
+    url: "https://images.unsplash.com/photo-1474511320723-9a56873867b5?w=800&q=80",
+    prompt: "Identify this animal and describe its features, breed if applicable, and behavior."
+  }
+];
+
+function loadDemoSample(sample) {
+  clearMessages();
+  conversationHistory = [];
+  addThinkingMsg("Loading demo image...");
+
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  img.onload = () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+    currentImageBase64 = dataUrl.split(",")[1];
+    currentImageMime = "image/jpeg";
+    previewImg.src = dataUrl;
+    dropZone.classList.add("has-image");
+    imagesAnalyzed++;
+    statImages.textContent = imagesAnalyzed;
+    document.getElementById("chat-input").disabled = false;
+
+    clearMessages();
+    addSystemMessage(`Demo loaded: <strong>${sample.label}</strong> — asking AI now...`);
+    updateSendBtn();
+
+    // Auto-ask the demo prompt
+    setTimeout(() => {
+      textarea.value = sample.prompt;
+      sendMessage();
+    }, 500);
+  };
+  img.onerror = () => {
+    clearMessages();
+    addSystemMessage("Could not load demo image. Please upload your own image instead.");
+  };
+  img.src = sample.url;
+}
+
+// ─── Image Loading ────────────────────────────────────────────────────────────
+function getMediaType(file) {
+  const map = { "image/jpeg": "image/jpeg", "image/jpg": "image/jpeg", "image/png": "image/png", "image/gif": "image/gif", "image/webp": "image/webp" };
+  return map[file.type] || "image/jpeg";
+}
 
 function loadImageFile(file) {
   if (!file || !file.type.startsWith("image/")) return;
-  const mimeMap = { "image/jpeg": "image/jpeg", "image/jpg": "image/jpeg", "image/png": "image/png", "image/gif": "image/gif", "image/webp": "image/webp" };
   const reader = new FileReader();
   reader.onload = (e) => {
     const dataUrl = e.target.result;
     currentImageBase64 = dataUrl.split(",")[1];
-    currentImageMime = mimeMap[file.type] || "image/jpeg";
+    currentImageMime = getMediaType(file);
     previewImg.src = dataUrl;
     dropZone.classList.add("has-image");
     conversationHistory = [];
     imagesAnalyzed++;
     statImages.textContent = imagesAnalyzed;
     clearMessages();
-    addSystemMessage(`Image loaded: ${file.name}. Ask me anything about it!`);
+    addSystemMessage(`Image loaded: <strong>${file.name}</strong>. Ask me anything about it!`);
+    document.getElementById("chat-input").disabled = false;
     updateSendBtn();
   };
   reader.readAsDataURL(file);
 }
 
-// ─── Drop Zone ─────────────────────────────────────────────────────────────
-
-dropZone.addEventListener("click", () => fileInput.click());
+// ─── Drop Zone ────────────────────────────────────────────────────────────────
+dropZone.addEventListener("click", () => { if (!dropZone.classList.contains("has-image")) fileInput.click(); });
 fileInput.addEventListener("change", (e) => loadImageFile(e.target.files[0]));
-
-dropZone.addEventListener("dragover", (e) => {
-  e.preventDefault();
-  dropZone.classList.add("dragover");
-});
-
+dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.classList.add("dragover"); });
 dropZone.addEventListener("dragleave", () => dropZone.classList.remove("dragover"));
-
-dropZone.addEventListener("drop", (e) => {
-  e.preventDefault();
-  dropZone.classList.remove("dragover");
-  loadImageFile(e.dataTransfer.files[0]);
-});
-
-// Global drag-and-drop
+dropZone.addEventListener("drop", (e) => { e.preventDefault(); dropZone.classList.remove("dragover"); loadImageFile(e.dataTransfer.files[0]); });
 document.addEventListener("dragover", (e) => e.preventDefault());
-document.addEventListener("drop", (e) => {
-  e.preventDefault();
-  const file = e.dataTransfer.files[0];
-  if (file?.type.startsWith("image/")) loadImageFile(file);
-});
+document.addEventListener("drop", (e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f?.type.startsWith("image/")) loadImageFile(f); });
 
-// ─── Quick Actions ──────────────────────────────────────────────────────────
-
+// ─── Quick Actions ─────────────────────────────────────────────────────────────
 document.querySelectorAll(".quick-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
     const prompt = btn.dataset.prompt;
-    if (prompt && !isLoading) {
-      textarea.value = prompt;
-      sendMessage();
-    }
+    if (prompt && !isLoading) { textarea.value = prompt; sendMessage(); }
   });
 });
 
-// ─── Chat ───────────────────────────────────────────────────────────────────
+// ─── Demo buttons ──────────────────────────────────────────────────────────────
+document.querySelectorAll(".demo-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const idx = parseInt(btn.dataset.index);
+    loadDemoSample(DEMO_SAMPLES[idx]);
+  });
+});
 
+// ─── Chat ──────────────────────────────────────────────────────────────────────
 function clearMessages() {
   chatMessages.innerHTML = "";
-  emptyChat.style.display = "none";
+  if (emptyChat) emptyChat.style.display = "none";
 }
 
-function addSystemMessage(text) {
+function addThinkingMsg(text) {
   clearMessages();
   const el = document.createElement("div");
   el.className = "msg assistant";
-  el.innerHTML = `
-    <div class="msg-av">
-      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-    </div>
-    <div class="bubble"><span>${text}</span></div>
-  `;
+  el.innerHTML = `<div class="msg-av"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+    <div class="bubble" style="color:var(--text-muted);font-style:italic">${text}</div>`;
+  chatMessages.appendChild(el);
+}
+
+function addSystemMessage(html) {
+  clearMessages();
+  const el = document.createElement("div");
+  el.className = "msg assistant";
+  el.innerHTML = `<div class="msg-av"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+    <div class="bubble"><span>${html}</span></div>`;
   chatMessages.appendChild(el);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
@@ -102,16 +176,11 @@ function addMessage(role, text) {
   if (emptyChat) emptyChat.style.display = "none";
   const el = document.createElement("div");
   el.className = `msg ${role}`;
-
   const isUser = role === "user";
   const iconSvg = isUser
     ? `<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>`
     : `<svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`;
-
-  el.innerHTML = `
-    <div class="msg-av">${iconSvg}</div>
-    <div class="bubble"><span style="white-space:pre-wrap">${escapeHtml(text)}</span></div>
-  `;
+  el.innerHTML = `<div class="msg-av">${iconSvg}</div><div class="bubble"><span style="white-space:pre-wrap">${escapeHtml(text)}</span></div>`;
   chatMessages.appendChild(el);
   chatMessages.scrollTop = chatMessages.scrollHeight;
   return el;
@@ -122,16 +191,8 @@ function addTyping() {
   const el = document.createElement("div");
   el.className = "msg assistant";
   el.id = "typing-msg";
-  el.innerHTML = `
-    <div class="msg-av">
-      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-    </div>
-    <div class="typing-indicator">
-      <div class="typing-dot"></div>
-      <div class="typing-dot"></div>
-      <div class="typing-dot"></div>
-    </div>
-  `;
+  el.innerHTML = `<div class="msg-av"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+    <div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
   chatMessages.appendChild(el);
   chatMessages.scrollTop = chatMessages.scrollHeight;
   return el;
@@ -153,10 +214,7 @@ textarea.addEventListener("input", () => {
 });
 
 textarea.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault();
-    if (!sendBtn.disabled) sendMessage();
-  }
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); if (!sendBtn.disabled) sendMessage(); }
 });
 
 sendBtn.addEventListener("click", sendMessage);
@@ -177,17 +235,14 @@ async function sendMessage() {
     { type: "text", text },
   ];
 
-  // Only include image on first message of a conversation
   const historyEntry = conversationHistory.length === 0
     ? { role: "user", content: userContent }
     : { role: "user", content: [{ type: "text", text }] };
 
   conversationHistory.push(historyEntry);
-
   const typingEl = addTyping();
 
   try {
-    // Rebuild messages with image only on first turn
     const messages = conversationHistory.map((m, i) => {
       if (i === 0 && currentImageBase64) return m;
       return { role: m.role, content: typeof m.content === "string" ? m.content : m.content.filter(b => b.type === "text").map(b => b.text).join("") };
@@ -199,7 +254,7 @@ async function sendMessage() {
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
         max_tokens: 1000,
-        system: "You are VisionAI, an expert image analysis assistant. Analyze images thoroughly and answer questions about their content with clarity and detail. Be concise but comprehensive. Format long lists with line breaks. Never refuse to describe what you see.",
+        system: "You are VisionAI, an expert image analysis assistant. Analyze images thoroughly and answer questions about their content with clarity and detail. Be concise but comprehensive. Format lists with line breaks for readability.",
         messages,
       }),
     });
@@ -218,11 +273,12 @@ async function sendMessage() {
     }
   } catch (err) {
     typingEl.remove();
-    addMessage("assistant", "Connection error. Make sure the server is running.");
+    addMessage("assistant", "Connection error. Please try again.");
   }
 
   isLoading = false;
   updateSendBtn();
+  chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 // Init
