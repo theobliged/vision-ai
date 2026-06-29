@@ -252,13 +252,10 @@ const historyEntry = { role: "user", content: userContent };
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: 1000,
-        system: "You are VisionAI, an expert image analysis assistant. Analyze images thoroughly and answer questions about their content with clarity and detail. Be concise but comprehensive. Format lists with line breaks for readability.",
-        messages,
-      }),
-    });
-
+  imageBase64: currentImageBase64,
+  imageMime: currentImageMime,
+  prompt: text,
+}),
     const data = await response.json();
     typingEl.remove();
 
