@@ -1,7 +1,15 @@
 {
   "version": 2,
+  "builds": [
+    { "src": "api/analyze.js", "use": "@vercel/node" },
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "css/**", "use": "@vercel/static" },
+    { "src": "js/**", "use": "@vercel/static" }
+  ],
   "routes": [
     { "src": "/api/analyze", "dest": "/api/analyze.js" },
-    { "src": "/(.*)", "dest": "/$1" }
+    { "src": "/css/(.*)", "dest": "/css/$1" },
+    { "src": "/js/(.*)", "dest": "/js/$1" },
+    { "src": "/", "dest": "/index.html" }
   ]
 }
