@@ -235,10 +235,10 @@ async function sendMessage() {
     { type: "text", text },
   ];
 
-  const historyEntry = conversationHistory.length === 0
+  
     ? { role: "user", content: userContent }
     : { role: "user", content: [{ type: "text", text }] };
-
+const historyEntry = { role: "user", content: userContent };
   conversationHistory.push(historyEntry);
   const typingEl = addTyping();
 
