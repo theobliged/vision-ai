@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VisionAI — Image Recognition</title>
+  <meta name="description" content="AI-powered image recognition and analysis using Claude claude-sonnet-4-6" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="white" stroke-width="2" fill="none"/>
+          <circle cx="12" cy="12" r="3" fill="white"/>
+        </svg>
+      </div>
+      VisionAI
+    </div>
+    <span class="nav-pill">Powered by Claude claude-sonnet-4-6</span>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">AI Image Analysis</div>
+    <h1>See everything.<br><span>Understand anything.</span></h1>
+    <p class="hero-sub">Upload any image and have a conversation about it. Powered by Claude's advanced vision model.</p>
+
+    <div class="caps-strip">
+      <span class="cap-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/><path d="M20.5 10H19V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/><path d="M9.5 14c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5S8 21.33 8 20.5v-5c0-.83.67-1.5 1.5-1.5z"/><path d="M3.5 14H5v1.5c0 .83-.67 1.5-1.5 1.5S2 16.33 2 15.5 2.67 14 3.5 14z"/><path d="M14 14.5c0-.83.67-1.5 1.5-1.5h5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-5c-.83 0-1.5-.67-1.5-1.5z"/><path d="M15.5 9H17v1.5c0 .83-.67 1.5-1.5 1.5S14 11.33 14 10.5 14.67 9 15.5 9z"/><path d="M10 9.5C10 8.67 9.33 8 8.5 8h-5C2.67 8 2 8.67 2 9.5S2.67 11 3.5 11h5c.83 0 1.5-.67 1.5-1.5z"/><path d="M8.5 15H7v-1.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+        Object Detection
+      </span>
+      <span class="cap-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V4h3"/><path d="M17 4h3v3"/><path d="M4 17v3h3"/><path d="M17 20h3v-3"/><rect x="7" y="7" width="10" height="10" rx="1"/></svg>
+        Scene Understanding
+      </span>
+      <span class="cap-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Text Extraction
+      </span>
+      <span class="cap-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Chart Analysis
+      </span>
+      <span class="cap-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg>
+        Face Description
+      </span>
+    </div>
+  </section>
+
+  <!-- APP -->
+  <main class="app">
+
+    <!-- LEFT: Upload + Actions -->
+    <div class="upload-panel">
+      <div class="drop-zone" id="drop-zone" role="button" tabindex="0" aria-label="Upload image">
+        <img id="preview-img" alt="Uploaded image preview" />
+        <div class="drop-content">
+          <div class="drop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <path d="M21 15l-5-5L5 21"/>
+            </svg>
+          </div>
+          <div class="drop-title">Drop an image here</div>
+          <div class="drop-sub">or click to browse your files</div>
+          <div class="file-types">
+            <span class="ft-badge">JPG</span>
+            <span class="ft-badge">PNG</span>
+            <span class="ft-badge">WEBP</span>
+            <span class="ft-badge">GIF</span>
+          </div>
+        </div>
+      </div>
+
+      <input type="file" id="file-input" accept="image/*" style="display:none" aria-label="Choose image file" />
+
+      <div class="action-row">
+        <button class="quick-btn" data-prompt="What objects and elements do you see in this image? List them all." disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Detect objects
+        </button>
+        <button class="quick-btn" data-prompt="Describe this image in full detail — the scene, colors, mood, and any notable elements." disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+          Full description
+        </button>
+        <button class="quick-btn" data-prompt="Extract and transcribe all text visible in this image." disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Read text (OCR)
+        </button>
+        <button class="quick-btn" data-prompt="What is the dominant color palette in this image? Describe the colors and their mood." disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+          Color palette
+        </button>
+        <button class="quick-btn" data-prompt="Could this image be used commercially? Describe its potential use cases." disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+          Commercial use?
+        </button>
+        <button class="quick-btn" data-prompt="Rate the technical quality of this image (sharpness, exposure, composition) on a scale of 1-10 with reasons." disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Rate quality
+        </button>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-bar">
+        <div class="stat-card">
+          <div class="stat-label">Images</div>
+          <div class="stat-value purple" id="stat-images">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Queries</div>
+          <div class="stat-value purple" id="stat-queries">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Model</div>
+          <div class="stat-value green" style="font-size:12px;padding-top:4px">claude-sonnet-4-6</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Chat -->
+    <div class="chat-panel">
+      <div class="chat-header">
+        <div class="chat-avatar">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <div>
+          <div class="chat-title">VisionAI Assistant</div>
+          <div class="chat-sub">Ask anything about your image</div>
+        </div>
+        <div class="status-dot"></div>
+      </div>
+
+      <div class="messages" id="chat-messages">
+        <div class="empty-chat" id="empty-chat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <path d="M21 15l-5-5L5 21"/>
+          </svg>
+          <p>Upload an image to start a<br>conversation with the AI.</p>
+        </div>
+      </div>
+
+      <div class="input-area">
+        <div class="input-row">
+          <textarea id="chat-input" placeholder="Ask about the image…" rows="1" disabled></textarea>
+          <button class="send-btn" id="send-btn" aria-label="Send" disabled>
+            <svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
+          </button>
+        </div>
+        <p class="hint">Press Enter to send · Shift+Enter for new line</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    Built with <a href="https://www.anthropic.com" target="_blank" rel="noopener">Anthropic Claude</a> ·
+    <a href="https://github.com" target="_blank" rel="noopener">View on GitHub</a>
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script>
+    // Enable textarea once image is loaded
+    const observer = new MutationObserver(() => {
+      const hasImage = document.getElementById("drop-zone").classList.contains("has-image");
+      document.getElementById("chat-input").disabled = !hasImage;
+    });
+    observer.observe(document.getElementById("drop-zone"), { attributes: true, attributeFilter: ["class"] });
+  </script>
+</body>
+</html>
