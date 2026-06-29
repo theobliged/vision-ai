@@ -27,12 +27,19 @@ module.exports = async function handler(req, res) {
       let data = "";
       apiRes.on("data", (chunk) => (data += chunk));
       apiRes.on("end", () => {
-        try { res.status(apiRes.statusCode).json(JSON.parse(data)); }
-        catch { res.status(500).json({ error: "Invalid API response" }); }
+        try {
+          const parsed = JSON.parse(data);
+          res.status(apiRes.statusCode).json(parsed);
+        } catch (e) {
+          res.status(500).json({ error: "Invalid API response: " + data });
+        }
         resolve();
       });
     });
-    apiReq.on("error", (e) => { res.status(500).json({ error: e.message }); resolve(); });
+    apiReq.on("error", (e) => {
+      res.status(500).json({ error: e.message });
+      resolve();
+    });
     apiReq.write(body);
     apiReq.end();
   });
